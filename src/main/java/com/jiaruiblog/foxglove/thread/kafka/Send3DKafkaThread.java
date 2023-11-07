@@ -21,19 +21,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Slf4j
 public class Send3DKafkaThread extends SendDataThread {
 
-    public Send3DKafkaThread(int index, int frequency, Session session) {
+    private String topic;
+    private String group;
+
+    public Send3DKafkaThread(int index, int frequency, Session session,String topic,String group) {
         super(index, frequency, session);
+        this.topic = topic;
+        this.group = group;
     }
 
     @Override
     public void run() {
-        Properties props = KafkaUtil.getConsumerProperties("group-1", SceneUpdateDeserializer.class.getName());
-        String topic = "drive_3d";
+        Properties props = KafkaUtil.getConsumerProperties(group, SceneUpdateDeserializer.class.getName());
         List<ModelPrimitive> models = SceneUtil.addModels();
         try (KafkaConsumer<String, SceneUpdate> consumer = new KafkaConsumer<>(props)) {
             consumer.subscribe(Arrays.asList(topic));
@@ -57,7 +61,7 @@ public class Send3DKafkaThread extends SendDataThread {
                     }
                     i++;
                     JSONObject jsonObject = (JSONObject) JSONObject.toJSON(update);
-                    byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+                    byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
                     this.session.sendBinary(bytes);
                     Thread.sleep(frequency);
                     printLog();

@@ -8,7 +8,7 @@ import org.yeauty.pojo.Session;
 import java.time.LocalTime;
 import java.util.Random;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Slf4j
 public class SendMessageThread extends SendDataThread {
@@ -31,7 +31,7 @@ public class SendMessageThread extends SendDataThread {
             jsonObject.put("count", new Random().nextInt(1000));
             jsonObject.put("number", new Random().nextInt(1000));
 
-            byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+            byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
             this.session.sendBinary(bytes);
             printLog(100);
             try {

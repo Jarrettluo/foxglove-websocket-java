@@ -17,22 +17,22 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Base64;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Slf4j
 public class SendImageThread extends SendDataThread {
 
     private int MAX_COUNT = 1445;
 
-    private String rtsp = "rtsp://127.0.0.1:8554/demo";
+    private String rtsp;
 
-    public SendImageThread(int index, int frequency, Session session) {
+    public SendImageThread(int index, int frequency, Session session,String rtsp) {
         super(index, frequency, session);
+        this.rtsp = rtsp;
     }
 
     @Override
     public void run() {
-        rtsp = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4";
         sendImageByRTSP();
     }
 
@@ -50,6 +50,7 @@ public class SendImageThread extends SendDataThread {
             Frame frame;
             long startTime = System.currentTimeMillis();
             long frameCount = 0;
+            String imageFormat = "jpg";
             while ((frame = grabber.grabImage()) != null && running) {
                 // 按照指定频率处理帧
                 if ((System.currentTimeMillis() - startTime) < (frameCount * 1000 / frequency)) {
@@ -61,17 +62,17 @@ public class SendImageThread extends SendDataThread {
 
                 BufferedImage image = converter.getBufferedImage(frame);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(image, "png", baos);
+                ImageIO.write(image, imageFormat, baos);
 
                 byte[] encode = Base64.getEncoder().encode(baos.toByteArray());
                 String data = new String(encode);
                 compressedImage.setData(data);
-                compressedImage.setFormat("png");
-                compressedImage.setFrame_id("main");
+                compressedImage.setFormat(imageFormat);
+                compressedImage.setFrameId("main_image");
                 compressedImage.setTimestamp(timestamp);
 
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(compressedImage);
-                byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+                byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
                 this.session.sendBinary(bytes);
 
                 // long类型不用担心溢出
@@ -79,7 +80,7 @@ public class SendImageThread extends SendDataThread {
 
                 printLog(100);
             }
-
+            log.info("--------------------图片发送线程停止运行: " + Thread.currentThread().getName());
         } catch (FFmpegFrameGrabber.Exception e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -103,7 +104,7 @@ public class SendImageThread extends SendDataThread {
                 }
                 CompressedImage rawImage = readImageLocal(count);
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(rawImage);
-                byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+                byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
                 this.session.sendBinary(bytes);
                 Thread.sleep(frequency);
             }
@@ -116,7 +117,6 @@ public class SendImageThread extends SendDataThread {
         CompressedImage image = new CompressedImage();
         String filePath = "E:\\foxglove\\image_rtsp\\" + index + ".png";
         try (InputStream is = new FileInputStream(filePath)) {
-            Timestamp timestamp = DateUtil.createTimestamp();
 
             byte[] bytes = IOUtils.toByteArray(is);
             image.setFormat("jpeg");

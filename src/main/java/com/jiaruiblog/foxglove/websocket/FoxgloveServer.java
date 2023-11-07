@@ -6,12 +6,14 @@ import com.alibaba.fastjson.TypeReference;
 import com.jiaruiblog.foxglove.entity.Advertise;
 import com.jiaruiblog.foxglove.entity.ServerInfo;
 import com.jiaruiblog.foxglove.entity.Subscription;
+import com.jiaruiblog.foxglove.thread.SendChassisThread;
 import com.jiaruiblog.foxglove.thread.SendDataThread;
 import com.jiaruiblog.foxglove.util.ChannelUtil;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.MultiValueMap;
 import org.yeauty.annotation.*;
 import org.yeauty.pojo.Session;
@@ -41,7 +43,7 @@ public class FoxgloveServer {
      */
     private Session session;
 
-    private String code;
+    private String chassisCode;
 
     private Map<Integer, SendDataThread> threadMap = new HashMap<>();
 
@@ -112,8 +114,14 @@ public class FoxgloveServer {
         String data = new String(Arrays.copyOfRange(bytes, 5, bytes.length));
         JSONObject message = JSON.parseObject(data);
         log.info("--------binary message:\t" + message);
-        code = message.getString("code");
-        threadMap.forEach((k, v) -> v.setCode(code));
+        String newChassisCode = message.getString("code");
+        if (!StringUtils.equals(chassisCode, newChassisCode)) {
+            chassisCode = newChassisCode;
+            threadMap.forEach((k, v) -> v.setCode(chassisCode));
+            SendChassisThread chassisThread = new SendChassisThread(0, 100, session);
+            chassisThread.setCode(chassisCode);
+            new Thread(chassisThread).start();
+        }
     }
 
     @OnEvent
@@ -142,11 +150,11 @@ public class FoxgloveServer {
         log.info("============开始创建基于channel的数据发送线程==============" + subscribeList);
         for (Subscription sub : subscribeList) {
             Integer channelId = sub.getChannelId();
-            int frequency = channelId == 3 ? 50 : 100;
+            int frequency = channelId == 4 ? 50 : 100;
             SendDataThread thread = ChannelUtil.getKafkaSendThread(sub.getId(), channelId, frequency, session);
             String threadName = "thread-" + channelId + "-" + RandomStringUtils.randomAlphabetic(6).toLowerCase();
             thread.setName(threadName);
-            thread.setCode(code == null ? "10000" : code);
+            thread.setCode(chassisCode == null ? "10000" : chassisCode);
             thread.start();
             threadMap.put(channelId, thread);
         }

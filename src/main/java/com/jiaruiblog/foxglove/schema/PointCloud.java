@@ -1,5 +1,6 @@
 package com.jiaruiblog.foxglove.schema;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -7,9 +8,11 @@ public class PointCloud {
 
     public Timestamp timestamp;
 
-    private String frame_id;
+    @JsonProperty("frame_id")
+    private String frameId;
 
-    private Integer point_stride;
+    @JsonProperty("point_stride")
+    private Integer pointStride;
 
     private String data;
 

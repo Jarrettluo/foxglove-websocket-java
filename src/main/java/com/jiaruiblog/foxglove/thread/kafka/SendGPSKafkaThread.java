@@ -17,19 +17,23 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Slf4j
 public class SendGPSKafkaThread extends SendDataThread {
 
-    public SendGPSKafkaThread(int index, int frequency, Session session) {
+    private String topic;
+    private String group;
+
+    public SendGPSKafkaThread(int index, int frequency, Session session, String topic, String group) {
         super(index, frequency, session);
+        this.topic = topic;
+        this.group = group;
     }
 
     @Override
     public void run() {
-        Properties props = KafkaUtil.getConsumerProperties("group-1-a", LocationFixDeserializer.class.getName());
-        String topic = "drive_gps_mixed";
+        Properties props = KafkaUtil.getConsumerProperties(group, LocationFixDeserializer.class.getName());
         try (KafkaConsumer<String, LocationFix> consumer = new KafkaConsumer<>(props)) {
             TopicPartition partition = new TopicPartition(topic, 0);
             consumer.assign(Arrays.asList(partition));
@@ -44,7 +48,7 @@ public class SendGPSKafkaThread extends SendDataThread {
                         continue;
                     }
                     JSONObject jsonObject = (JSONObject) JSONObject.toJSON(gps);
-                    byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+                    byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
                     this.session.sendBinary(bytes);
                     Thread.sleep(frequency);
                     printLog();

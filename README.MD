@@ -32,6 +32,7 @@ Implementations are available in the following languages:
 ```bash
 ffmpeg -re -i E:\foxglove\test_video.mp4 -vcodec libx264 -acodec aac -f flv rtmp://127.0.0.1:1935/demo
 ffmpeg -re -i E:\foxglove\bmw_drive.mp4 -vcodec libx264 -acodec aac -f flv rtmp://127.0.0.1:1935/demo
+ffmpeg -re -i E:\foxglove\usa_drive_2.mp4 -vcodec libx264 -acodec aac -f flv rtmp://127.0.0.1:1935/demo
 ```
 
 高德开放瓦片地图图层 https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}

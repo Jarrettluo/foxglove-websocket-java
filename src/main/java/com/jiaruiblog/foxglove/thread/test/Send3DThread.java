@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Slf4j
 public class Send3DThread extends SendDataThread {
@@ -101,7 +101,7 @@ public class Send3DThread extends SendDataThread {
             i++;
             printLog(100);
             JSONObject jsonObject = (JSONObject) JSON.toJSON(sceneUpdate);
-            byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+            byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
             this.session.sendBinary(bytes);
             try {
                 Thread.sleep(frequency);

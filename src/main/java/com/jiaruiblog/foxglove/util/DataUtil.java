@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class DataUtil {
 
-    public static byte[] getFormatedBytes(byte[] data, int channel) {
-        return getFormatedBytes(data, 0, channel);
+    public static byte[] getFormattedBytes(byte[] data, int channel) {
+        return getFormattedBytes(data, 0, channel);
     }
 
-    public static byte[] getFormatedBytes(byte[] data, long ns, int channel) {
+    public static byte[] getFormattedBytes(byte[] data, long ns, int channel) {
         byte constantInfo = 1;
         byte[] constantInfoByte = new byte[]{constantInfo};
         byte[] dataType = getIntBytes(channel);

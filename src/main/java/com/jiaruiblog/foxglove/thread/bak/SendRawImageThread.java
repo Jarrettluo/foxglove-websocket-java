@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Deprecated
 public class SendRawImageThread implements Runnable {
@@ -39,7 +39,7 @@ public class SendRawImageThread implements Runnable {
                 }
                 RawImage rawImage = readImage(count);
                 JSONObject jsonObject = (JSONObject) JSON.toJSON(rawImage);
-                byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+                byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
                 this.session.sendBinary(bytes);
                 TimeUnit.SECONDS.sleep(1);
             }

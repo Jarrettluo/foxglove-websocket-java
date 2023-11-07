@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Slf4j
 public class SendGPSThread extends SendDataThread {
@@ -58,7 +58,7 @@ public class SendGPSThread extends SendDataThread {
             i++;
             locationFix.setTimestamp(DateUtil.createTimestamp());
             JSONObject jsonObject = (JSONObject) JSON.toJSON(locationFix);
-            byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+            byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
             this.session.sendBinary(bytes);
             printLog(100);
             try {

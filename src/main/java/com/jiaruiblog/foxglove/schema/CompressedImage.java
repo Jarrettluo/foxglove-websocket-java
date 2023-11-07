@@ -1,5 +1,6 @@
 package com.jiaruiblog.foxglove.schema;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -14,7 +15,8 @@ public class CompressedImage {
 
     private Timestamp timestamp;
 
-    private String frame_id;
+    @JsonProperty("frame_id")
+    private String frameId;
 
     private String format;
 

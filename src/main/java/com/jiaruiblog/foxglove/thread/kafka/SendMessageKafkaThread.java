@@ -16,19 +16,23 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 
-import static com.jiaruiblog.foxglove.util.DataUtil.getFormatedBytes;
+import static com.jiaruiblog.foxglove.util.DataUtil.getFormattedBytes;
 
 @Slf4j
 public class SendMessageKafkaThread extends SendDataThread {
 
-    public SendMessageKafkaThread(int index, int frequency, Session session) {
+    private String topic;
+    private String group;
+
+    public SendMessageKafkaThread(int index, int frequency, Session session, String topic, String group) {
         super(index, frequency, session);
+        this.topic = topic;
+        this.group = group;
     }
 
     @Override
     public void run() {
-        Properties props = KafkaUtil.getConsumerProperties("group-1", RawMessageDeserializer.class.getName());
-        String topic = "raw_message";
+        Properties props = KafkaUtil.getConsumerProperties(group, RawMessageDeserializer.class.getName());
         try (KafkaConsumer<String, RawMessage> consumer = new KafkaConsumer<>(props)) {
             consumer.subscribe(Arrays.asList(topic));
             boolean validCode = StringUtils.isNotBlank(code);
@@ -40,7 +44,7 @@ public class SendMessageKafkaThread extends SendDataThread {
                         message.setChassisCode(code);
                     }
                     JSONObject jsonObject = (JSONObject) JSONObject.toJSON(message);
-                    byte[] bytes = getFormatedBytes(jsonObject.toJSONString().getBytes(), index);
+                    byte[] bytes = getFormattedBytes(jsonObject.toJSONString().getBytes(), index);
                     this.session.sendBinary(bytes);
                     Thread.sleep(frequency);
                     super.printLog();

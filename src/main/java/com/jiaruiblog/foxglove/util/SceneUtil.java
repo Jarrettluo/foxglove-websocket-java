@@ -16,7 +16,7 @@ public class SceneUtil {
 
         SceneEntity entity = new SceneEntity();
         entity.setTimestamp(ts);
-        entity.setFrame_id(frameId);
+        entity.setFrameId(frameId);
         entity.setFrame_locked(true);
         entity.setId(id);
         entity.setMetadata(metadata);

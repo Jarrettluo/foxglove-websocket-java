@@ -1,5 +1,6 @@
 package com.jiaruiblog.foxglove.schema;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.sound.sampled.Line;
@@ -20,7 +21,8 @@ public class SceneEntity {
 
     private Timestamp lifetime;
 
-    private String frame_id;
+    @JsonProperty("frame_id")
+    private String frameId;
 
     private String id;
 

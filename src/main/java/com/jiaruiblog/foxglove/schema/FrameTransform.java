@@ -1,5 +1,6 @@
 package com.jiaruiblog.foxglove.schema;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -14,9 +15,11 @@ public class FrameTransform {
 
     private Timestamp timestamp;
 
-    private String parent_frame_id;
+    @JsonProperty("parent_frame_id")
+    private String parentFrameId;
 
-    private String child_frame_id;
+    @JsonProperty("child_frame_id")
+    private String childFrameId;
 
     private Vector3 translation;
 
